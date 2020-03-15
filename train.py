@@ -55,18 +55,18 @@ def evaluate(encoder, decoder, sentence,input_lang, output_lang, max_length=MAX_
         return decoded_words, decoder_attentions[:di + 1]
 
 
-def trainIters(encoder, decoder, pairs_train, pairs_test, input_lang, output_lang, n_epochs, learning_rate=0.01):
+def trainIters(encoder, decoder, pairs_train, pairs_test, input_lang, output_lang, args):
     start = time.time()
     writer = SummaryWriter(log_dir = './logs/_{:%Y_%m_%d_%H_%M}'.format(datetime.datetime.now()))
 
-    encoder_optimizer = optim.SGD(encoder.parameters(), lr=learning_rate)
-    decoder_optimizer = optim.SGD(decoder.parameters(), lr=learning_rate)
+    encoder_optimizer = optim.SGD(encoder.parameters(), lr=args.lr)
+    decoder_optimizer = optim.SGD(decoder.parameters(), lr=args.lr)
     train_pairs = [tensorsFromPair(pairs_train[i], input_lang, output_lang, EOS_token, SOS_token)
                       for i in range(len(pairs_train))]
     test_pairs = [tensorsFromPair(pairs_test[i], input_lang, output_lang, EOS_token, SOS_token)
                     for i in range(len(pairs_test))]
     criterion = nn.NLLLoss()
-    for epoch in range(n_epochs):
+    for epoch in range(args.n_epochs):
         for iter in tqdm(range(len(train_pairs))):
             train_pair = train_pairs[iter]
             input_tensor = train_pair[0]
@@ -84,8 +84,8 @@ def trainIters(encoder, decoder, pairs_train, pairs_test, input_lang, output_lan
         print('Input: ', pair[0], 'GT translation: ', pair[1], 'Model translation: ', output_sentence)
 
         writer.add_scalar('Loss/test', test_loss, epoch)
-        torch.save(encoder.state_dict(), './models/encoder'+repr(epoch)+ '.pth')
-        torch.save(decoder.state_dict(), './models/decoder'+repr(epoch)+ '.pth')
+        torch.save(encoder.state_dict(), './checkpoints/encoder_' + args.langs[0] + '_' + args.langs[1] + repr(epoch)+ '.pth')
+        torch.save(decoder.state_dict(), './checkpoints/decoder' + args.langs[0] + '_' + args.langs[1] + repr(epoch)+ '.pth')
 
 
 def eval(test_pairs, encoder, decoder, criterion):
@@ -176,7 +176,7 @@ def main():
     encoder = EncoderRNN(input_lang.n_words, hidden_size).to(device)
     attn_decoder = AttnDecoderRNN(hidden_size, output_lang.n_words, dropout_p=0.1, max_length = MAX_LENGTH).to(device)
 
-    trainIters(encoder, attn_decoder, pairs_train, pairs_test, input_lang, output_lang, args.n_epochs)
+    trainIters(encoder, attn_decoder, pairs_train, pairs_test, input_lang, output_lang, args)
 
 if __name__ == '__main__':
     main()
