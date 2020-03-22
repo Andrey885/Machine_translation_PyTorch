@@ -1,16 +1,12 @@
-import numpy as np
-import pandas as pd
 import torch
 from torch import nn, optim
-import torch.nn.functional as F
 from torch.utils.tensorboard.writer import SummaryWriter
 import argparse
 import datetime
 import random
 import time
-import math
 from tqdm import tqdm
-from models import Lang, EncoderRNN, DecoderRNN, AttnDecoderRNN
+from models import EncoderRNN, AttnDecoderRNN
 from data import tensorFromSentence, prepareData, tensorsFromPair
 
 MAX_LENGTH = 10
@@ -19,7 +15,7 @@ EOS_token = 1
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def evaluate(encoder, decoder, sentence,input_lang, output_lang, max_length=MAX_LENGTH):
+def evaluate(encoder, decoder, sentence, input_lang, output_lang, max_length=MAX_LENGTH):
     with torch.no_grad():
         input_tensor = tensorFromSentence(input_lang, sentence, EOS_token, SOS_token)
         input_length = input_tensor.size()[0]
@@ -57,14 +53,14 @@ def evaluate(encoder, decoder, sentence,input_lang, output_lang, max_length=MAX_
 
 def trainIters(encoder, decoder, pairs_train, pairs_test, input_lang, output_lang, args):
     start = time.time()
-    writer = SummaryWriter(log_dir = './logs/_{:%Y_%m_%d_%H_%M}'.format(datetime.datetime.now()))
+    writer = SummaryWriter(log_dir='./logs/_{:%Y_%m_%d_%H_%M}'.format(datetime.datetime.now()))
 
     encoder_optimizer = optim.SGD(encoder.parameters(), lr=args.lr)
     decoder_optimizer = optim.SGD(decoder.parameters(), lr=args.lr)
-    train_pairs = [tensorsFromPair(pairs_train[i], input_lang, output_lang, EOS_token, SOS_token)
-                      for i in range(len(pairs_train))]
-    test_pairs = [tensorsFromPair(pairs_test[i], input_lang, output_lang, EOS_token, SOS_token)
-                    for i in range(len(pairs_test))]
+    train_pairs = [tensorsFromPair(pairs_train[i], input_lang, output_lang, EOS_token)
+                   for i in range(len(pairs_train))]
+    test_pairs = [tensorsFromPair(pairs_test[i], input_lang, output_lang, EOS_token)
+                  for i in range(len(pairs_test))]
     criterion = nn.NLLLoss()
     for epoch in range(args.n_epochs):
         for iter in tqdm(range(len(train_pairs))):
@@ -84,8 +80,10 @@ def trainIters(encoder, decoder, pairs_train, pairs_test, input_lang, output_lan
         print('Input: ', pair[0], 'GT translation: ', pair[1], 'Model translation: ', output_sentence)
 
         writer.add_scalar('Loss/test', test_loss, epoch)
-        torch.save(encoder.state_dict(), './checkpoints/encoder_' + args.langs[0] + '_' + args.langs[1] + repr(epoch)+ '.pth')
-        torch.save(decoder.state_dict(), './checkpoints/decoder' + args.langs[0] + '_' + args.langs[1] + repr(epoch)+ '.pth')
+        torch.save(encoder.state_dict(),
+                   './checkpoints/encoder_' + args.langs[0] + '_' + args.langs[1] + repr(epoch) + '.pth')
+        torch.save(decoder.state_dict(),
+                   './checkpoints/decoder' + args.langs[0] + '_' + args.langs[1] + repr(epoch) + '.pth')
 
 
 def eval(test_pairs, encoder, decoder, criterion):
@@ -117,10 +115,11 @@ def eval(test_pairs, encoder, decoder, criterion):
                 if decoder_input.item() == EOS_token:
                     break
             test_loss += loss
-    return test_loss.cpu().numpy()/len(test_pairs)
+    return test_loss.cpu().numpy() / len(test_pairs)
 
 
-def train(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion, max_length=MAX_LENGTH, teacher_forcing_ratio = 0.5):
+def train(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion,
+          max_length=MAX_LENGTH, teacher_forcing_ratio=0.5):
     encoder_hidden = encoder.initHidden()
 
     encoder_optimizer.zero_grad()
@@ -167,16 +166,19 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--lr', default=0.01, type=float)
     parser.add_argument('--lr_drops', nargs='+', type=int, default=[100, 250, 350, 450], help='LR step sizes')
-    parser.add_argument('--langs', nargs='+', type=str, default=['eng', 'fra'], help='Languages to train model (eng-fra supported)')
+    parser.add_argument('--langs', nargs='+', type=str, default=['eng', 'fra'],
+                        help='Languages to train model (eng-fra supported)')
     parser.add_argument('--n_epochs', type=int, default=50, help='number of epochs to train model')
     parser.add_argument('--train_test_split', type=float, default=0.66, help='Ratio of train samples')
     args = parser.parse_args()
-    input_lang, output_lang, pairs_train, pairs_test = prepareData(args.langs[0], args.langs[1], MAX_LENGTH, args.train_test_split, True)
+    input_lang, output_lang, pairs_train, pairs_test = prepareData(args.langs[0], args.langs[1], MAX_LENGTH,
+                                                                   args.train_test_split, True)
     hidden_size = 256
     encoder = EncoderRNN(input_lang.n_words, hidden_size).to(device)
-    attn_decoder = AttnDecoderRNN(hidden_size, output_lang.n_words, dropout_p=0.1, max_length = MAX_LENGTH).to(device)
+    attn_decoder = AttnDecoderRNN(hidden_size, output_lang.n_words, dropout_p=0.1, max_length=MAX_LENGTH).to(device)
 
     trainIters(encoder, attn_decoder, pairs_train, pairs_test, input_lang, output_lang, args)
+
 
 if __name__ == '__main__':
     main()

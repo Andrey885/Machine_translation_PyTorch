@@ -1,8 +1,5 @@
 import torch
-from torch import nn, optim
-import torch.nn.functional as F
 import re
-import string
 import random
 import unicodedata
 from models import Lang
@@ -28,18 +25,18 @@ def normalizeString(s):
 
 def unicodeToAscii(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s)
-            if unicodedata.category(c) != 'Mn')
+                   if unicodedata.category(c) != 'Mn')
 
 
 def readLangs(lang1, lang2, reverse=False):
     print("Reading lines...")
 
     # Read the file and split into lines
-    lines = open('data/%s-%s.txt' % (lang1, lang2), encoding='utf-8').\
+    lines = open('data/%s-%s.txt' % (lang1, lang2), encoding='utf-8'). \
         read().strip().split('\n')
 
     # Split every line into pairs and normalize
-    pairs = [[normalizeString(s) for s in l.split('\t')] for l in lines]
+    pairs = [[normalizeString(s) for s in line.split('\t')] for line in lines]
 
     # Reverse pairs, make Lang instances
     if reverse:
@@ -55,8 +52,8 @@ def readLangs(lang1, lang2, reverse=False):
 
 def filterPair(p, max_length):
     return len(p[0].split(' ')) < max_length and \
-        len(p[1].split(' ')) < max_length and \
-        p[1].startswith(eng_prefixes)
+           len(p[1].split(' ')) < max_length and \
+           p[1].startswith(eng_prefixes)
 
 
 def filterPairs(pairs, max_length):
@@ -67,16 +64,16 @@ def indexesFromSentence(lang, sentence):
     return [lang.word2index[word] for word in sentence.split(' ')]
 
 
-def tensorFromSentence(lang, sentence, EOS_token, SOS_token):
+def tensorFromSentence(lang, sentence, EOS_token):
     indexes = indexesFromSentence(lang, sentence)
     indexes.append(EOS_token)
     return torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
 
 
-def tensorsFromPair(pair, input_lang, output_lang, EOS_token, SOS_token):
-    input_tensor = tensorFromSentence(input_lang, pair[0], EOS_token, SOS_token)
-    target_tensor = tensorFromSentence(output_lang, pair[1], EOS_token, SOS_token)
-    return (input_tensor, target_tensor)
+def tensorsFromPair(pair, input_lang, output_lang, EOS_token):
+    input_tensor = tensorFromSentence(input_lang, pair[0], EOS_token)
+    target_tensor = tensorFromSentence(output_lang, pair[1], EOS_token)
+    return input_tensor, target_tensor
 
 
 def prepareData(lang1, lang2, max_length, train_test_split, reverse=False):
@@ -91,7 +88,7 @@ def prepareData(lang1, lang2, max_length, train_test_split, reverse=False):
     print("Counted words:")
     print(input_lang.name, input_lang.n_words)
     print(output_lang.name, output_lang.n_words)
-    random.Random(4).shuffle(pairs) # shuffle apirs with seed 4
-    pairs_train = pairs[:int(train_test_split*len(pairs))]
-    pairs_test = pairs[int(train_test_split*len(pairs)):]
+    random.Random(4).shuffle(pairs)  # shuffle apirs with seed 4
+    pairs_train = pairs[:int(train_test_split * len(pairs))]
+    pairs_test = pairs[int(train_test_split * len(pairs)):]
     return input_lang, output_lang, pairs_train, pairs_test
