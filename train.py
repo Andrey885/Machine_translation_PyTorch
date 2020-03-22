@@ -4,12 +4,11 @@ from torch.utils.tensorboard.writer import SummaryWriter
 import argparse
 import datetime
 import random
-import time
 from tqdm import tqdm
 from models import EncoderRNN, AttnDecoderRNN
 from data import tensorFromSentence, prepareData, tensorsFromPair
 
-MAX_LENGTH = 10
+MAX_LENGTH = 15
 SOS_token = 0
 EOS_token = 1
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -17,7 +16,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def evaluate(encoder, decoder, sentence, input_lang, output_lang, max_length=MAX_LENGTH):
     with torch.no_grad():
-        input_tensor = tensorFromSentence(input_lang, sentence, EOS_token, SOS_token)
+        input_tensor = tensorFromSentence(input_lang, sentence, EOS_token)
         input_length = input_tensor.size()[0]
         encoder_hidden = encoder.initHidden()
 
@@ -52,7 +51,6 @@ def evaluate(encoder, decoder, sentence, input_lang, output_lang, max_length=MAX
 
 
 def trainIters(encoder, decoder, pairs_train, pairs_test, input_lang, output_lang, args):
-    start = time.time()
     writer = SummaryWriter(log_dir='./logs/_{:%Y_%m_%d_%H_%M}'.format(datetime.datetime.now()))
 
     encoder_optimizer = optim.SGD(encoder.parameters(), lr=args.lr)
@@ -63,14 +61,13 @@ def trainIters(encoder, decoder, pairs_train, pairs_test, input_lang, output_lan
                   for i in range(len(pairs_test))]
     criterion = nn.NLLLoss()
     for epoch in range(args.n_epochs):
-        for iter in tqdm(range(len(train_pairs))):
-            train_pair = train_pairs[iter]
+        for iteration in tqdm(range(len(train_pairs))):
+            train_pair = train_pairs[iteration]
             input_tensor = train_pair[0]
             target_tensor = train_pair[1]
-
             loss = train(input_tensor, target_tensor, encoder,
                          decoder, encoder_optimizer, decoder_optimizer, criterion)
-            writer.add_scalar('Loss/train', loss, epoch * len(train_pairs) + iter)
+            writer.add_scalar('Loss/train', loss, epoch * len(train_pairs) + iteration)
         print('Train loss: ', loss)
         test_loss = eval(test_pairs, encoder, decoder, criterion)
         print('Test loss: ', test_loss)
@@ -83,18 +80,16 @@ def trainIters(encoder, decoder, pairs_train, pairs_test, input_lang, output_lan
         torch.save(encoder.state_dict(),
                    './checkpoints/encoder_' + args.langs[0] + '_' + args.langs[1] + repr(epoch) + '.pth')
         torch.save(decoder.state_dict(),
-                   './checkpoints/decoder' + args.langs[0] + '_' + args.langs[1] + repr(epoch) + '.pth')
+                   './checkpoints/decoder_' + args.langs[0] + '_' + args.langs[1] + repr(epoch) + '.pth')
 
 
 def eval(test_pairs, encoder, decoder, criterion):
     test_loss = 0
     with torch.no_grad():
-        for iter in tqdm(range(len(test_pairs))):
-            test_pair = test_pairs[iter]
+        for iteration in tqdm(range(len(test_pairs))):
+            test_pair = test_pairs[iteration]
             input_tensor = test_pair[0]
             target_tensor = test_pair[1]
-            # test_loss += train(input_tensor, target_tensor, encoder,
-            # decoder, encoder_optimizer, decoder_optimizer, criterion)
             encoder_hidden = encoder.initHidden()
             encoder_outputs = torch.zeros(MAX_LENGTH, encoder.hidden_size, device=device)
             loss = 0

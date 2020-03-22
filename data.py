@@ -3,6 +3,7 @@ import re
 import random
 import unicodedata
 from models import Lang
+import pickle
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 eng_prefixes = (
@@ -15,6 +16,16 @@ eng_prefixes = (
 )
 
 
+def dump_pickle(object, path):
+    with open(path, 'wb') as file:
+        pickle.dump(object, file)
+
+
+def load_pickle(path):
+    with open(path, 'rb') as file:
+        return pickle.load(file)
+
+
 # Lowercase, trim, and remove non-letter characters
 def normalizeString(s):
     s = unicodeToAscii(s.lower().strip())
@@ -23,31 +34,8 @@ def normalizeString(s):
     return s
 
 
-def unicodeToAscii(s):
-    return ''.join(c for c in unicodedata.normalize('NFD', s)
-                   if unicodedata.category(c) != 'Mn')
-
-
-def readLangs(lang1, lang2, reverse=False):
-    print("Reading lines...")
-
-    # Read the file and split into lines
-    lines = open('data/%s-%s.txt' % (lang1, lang2), encoding='utf-8'). \
-        read().strip().split('\n')
-
-    # Split every line into pairs and normalize
-    pairs = [[normalizeString(s) for s in line.split('\t')] for line in lines]
-
-    # Reverse pairs, make Lang instances
-    if reverse:
-        pairs = [list(reversed(p)) for p in pairs]
-        input_lang = Lang(lang2)
-        output_lang = Lang(lang1)
-    else:
-        input_lang = Lang(lang1)
-        output_lang = Lang(lang2)
-
-    return input_lang, output_lang, pairs
+def indexesFromSentence(lang, sentence):
+    return [lang.word2index[word] for word in sentence.split(' ')]
 
 
 def filterPair(p, max_length):
@@ -58,22 +46,6 @@ def filterPair(p, max_length):
 
 def filterPairs(pairs, max_length):
     return [pair for pair in pairs if filterPair(pair, max_length)]
-
-
-def indexesFromSentence(lang, sentence):
-    return [lang.word2index[word] for word in sentence.split(' ')]
-
-
-def tensorFromSentence(lang, sentence, EOS_token):
-    indexes = indexesFromSentence(lang, sentence)
-    indexes.append(EOS_token)
-    return torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
-
-
-def tensorsFromPair(pair, input_lang, output_lang, EOS_token):
-    input_tensor = tensorFromSentence(input_lang, pair[0], EOS_token)
-    target_tensor = tensorFromSentence(output_lang, pair[1], EOS_token)
-    return input_tensor, target_tensor
 
 
 def prepareData(lang1, lang2, max_length, train_test_split, reverse=False):
@@ -92,3 +64,40 @@ def prepareData(lang1, lang2, max_length, train_test_split, reverse=False):
     pairs_train = pairs[:int(train_test_split * len(pairs))]
     pairs_test = pairs[int(train_test_split * len(pairs)):]
     return input_lang, output_lang, pairs_train, pairs_test
+
+
+def readLangs(lang1, lang2, reverse=False):
+    print("Reading lines...")
+
+    # Read the file and split into lines
+    lines = open('./data/%s-%s/%s-%s.txt' % (lang1, lang2, lang1, lang2), encoding='utf-8'). \
+        read().strip().split('\n')
+
+    # Split every line into pairs and normalize
+    pairs = [[normalizeString(s) for s in line.split('\t')] for line in lines]
+
+    # Reverse pairs, make Lang instances
+    if reverse:
+        pairs = [list(reversed(p)) for p in pairs]
+
+    input_lang = Lang(lang1)
+    output_lang = Lang(lang2)
+
+    return input_lang, output_lang, pairs
+
+
+def tensorFromSentence(lang, sentence, EOS_token):
+    indexes = indexesFromSentence(lang, sentence)
+    indexes.append(EOS_token)
+    return torch.tensor(indexes, dtype=torch.long, device=device).view(-1, 1)
+
+
+def tensorsFromPair(pair, input_lang, output_lang, EOS_token):
+    input_tensor = tensorFromSentence(input_lang, pair[0], EOS_token)
+    target_tensor = tensorFromSentence(output_lang, pair[1], EOS_token)
+    return input_tensor, target_tensor
+
+
+def unicodeToAscii(s):
+    return ''.join(c for c in unicodedata.normalize('NFD', s)
+                   if unicodedata.category(c) != 'Mn')
