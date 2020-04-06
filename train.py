@@ -95,7 +95,7 @@ def trainIters(encoder, decoder, pairs_train, pairs_test, input_lang, output_lan
             train_pair = train_pairs[iteration]
             input_tensor = train_pair[0]
             target_tensor = train_pair[1]
-            loss = train_sentence(input_tensor, target_tensor, encoder,
+            loss = trainSentence(input_tensor, target_tensor, encoder,
                                 decoder, encoder_optimizer, decoder_optimizer,
                                 criterion, args.max_sentence_length, output_lang)
             writer.add_scalar('Loss/train', loss, epoch * len(train_pairs) + iteration)
@@ -114,7 +114,7 @@ def trainIters(encoder, decoder, pairs_train, pairs_test, input_lang, output_lan
                    './checkpoints/decoder_' + args.langs[0] + '_' + args.langs[1] + repr(epoch) + '.pth')
 
 
-def train_sentence(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion,
+def trainSentence(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion,
                     max_length, lang, teacher_forcing_ratio=0.5):
     encoder_hidden = encoder.initHidden()
 
@@ -170,7 +170,7 @@ def main():
     parser.add_argument('--max_sentence_length', type=int, default=15, help = 'Max sentence length is used for attention mechanism')
     args = parser.parse_args()
 
-    data.check_fasttext_embeddings_downloaded(args.langs)
+    data.check_fasttext_embeddings_downloaded([args.langs[0]])
 
     input_lang, output_lang, pairs_train, pairs_test = data.prepareData(args, True)
 

@@ -15,13 +15,11 @@ class Lang:
 
         if embedding_dimension != 300:
             fasttext.util.reduce_model(self.pretrained_embedding, embedding_dimension)
-        self.word2index = {'SOS': 0,
-                        'EOS':1}
+        self.word2index = {'SOS': 0, 'EOS':1}
         self.index2word = {0: "SOS", 1: "EOS"}
 
         self.n_words = 2  # Count SOS and EOS
         self.embedding_dimension = embedding_dimension
-        # self.embedding_weights_matrix = []
 
     def addSentence(self, sentence):
         for word in sentence.split(' '):
@@ -29,24 +27,21 @@ class Lang:
 
     def addWord(self, word):
         """
-        Count words in dataset to create an embedding layer.
-        If word in pretrained_embedding vocabulary, we add its representation into
-        this Lang vocabulary. Otherwise, initialize a random vector.
+        Add word to Lang vocabluary.
+        Warning: all word in current dataset exist in current pretrained embedding.
+        It may not be true if you decide to train on another dataset.
         """
         if word not in self.word2index:
             self.word2index[word] = 1
             self.index2word[self.n_words] = word
 
             self.n_words += 1
-            # try:
-            #     self.embedding_weights_matrix.append(self.pretrained_embedding.get_word_vector(word))
-            # except KeyError:
-            #     self.embedding_weights_matrix.append(np.random.normal(scale=0.6, size=(self.embedding_dimension, )))
 
 
 class EncoderRNN(nn.Module):
     def __init__(self, hidden_size):
         super(EncoderRNN, self).__init__()
+        # inputs are supposed to be pre-embedded
         self.hidden_size = hidden_size
         self.gru = nn.GRU(hidden_size, hidden_size, num_layers = 1, batch_first=True)
 
