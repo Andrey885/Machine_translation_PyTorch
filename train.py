@@ -16,7 +16,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def evaluate(encoder, decoder, sentence, input_lang, output_lang, max_length):
     with torch.no_grad():
-        input_tensor = data.embeddingFromSentence(input_lang, sentence)
+        input_tensor = data.embeddingFromSentence(input_lang, sentence, device)
         encoder_hidden = encoder.initHidden()
 
         encoder_outputs = torch.zeros(max_length, encoder.hidden_size, device=device)
@@ -84,14 +84,15 @@ def trainIters(encoder, decoder, pairs_train, pairs_test, input_lang, output_lan
 
     encoder_optimizer = optim.SGD(encoder.parameters(), lr=args.lr)
     decoder_optimizer = optim.SGD(decoder.parameters(), lr=args.lr)
-    train_pairs = [data.tensorsFromPair(pairs_train[i], input_lang, output_lang)
+    train_pairs = [data.tensorsFromPair(pairs_train[i], input_lang, output_lang, device)
                    for i in range(len(pairs_train))]
-    test_pairs = [data.tensorsFromPair(pairs_test[i], input_lang, output_lang)
+    test_pairs = [data.tensorsFromPair(pairs_test[i], input_lang, output_lang, device)
                   for i in range(len(pairs_test))]
 
     criterion = nn.NLLLoss()
     for epoch in range(args.n_epochs):
         for iteration in tqdm(range(len(train_pairs))):
+
             train_pair = train_pairs[iteration]
             input_tensor = train_pair[0]
             target_tensor = train_pair[1]
@@ -99,15 +100,17 @@ def trainIters(encoder, decoder, pairs_train, pairs_test, input_lang, output_lan
                                 decoder, encoder_optimizer, decoder_optimizer,
                                 criterion, args.max_sentence_length, output_lang)
             writer.add_scalar('Loss/train', loss, epoch * len(train_pairs) + iteration)
-        print('Train loss: ', loss)
-        test_loss = eval(test_pairs, encoder, decoder, criterion, args.max_sentence_length, output_lang)
-        print('Test loss: ', test_loss)
-        pair = random.choice(pairs_test)
-        decoded_words, _ = evaluate(encoder, decoder, pair[0], input_lang, output_lang)
-        output_sentence = ' '.join(decoded_words)
-        print('Input: ', pair[0], 'GT translation: ', pair[1], 'Model translation: ', output_sentence)
+            if iteration % args.val_step == 0 or iteration == len(train_pairs) - 1:
+                print('Train loss: ', loss)
+                test_loss = eval(test_pairs, encoder, decoder, criterion, args.max_sentence_length, output_lang)
+                print('Test loss: ', test_loss)
+                pair = random.choice(pairs_test)
+                decoded_words, _ = evaluate(encoder, decoder, pair[0], input_lang, output_lang, args.max_sentence_length)
+                output_sentence = ' '.join(decoded_words)
+                print('Input: ', pair[0], 'GT translation: ', pair[1], 'Model translation: ', output_sentence)
+                writer.add_scalar('Loss/test', test_loss, iteration)
 
-        writer.add_scalar('Loss/test', test_loss, epoch)
+
         torch.save(encoder.state_dict(),
                    './checkpoints/encoder_' + args.langs[0] + '_' + args.langs[1] + repr(epoch) + '.pth')
         torch.save(decoder.state_dict(),
@@ -165,6 +168,7 @@ def main():
     parser.add_argument('--langs', nargs='+', type=str, default=['en', 'fr'],
                         help='Languages to train model (eng-fra supported)')
     parser.add_argument('--n_epochs', type=int, default=50, help='number of epochs to train model')
+    parser.add_argument('--val_step', type=int, default=20000, help='number of iteration between model evaluations')
     parser.add_argument('--train_test_split', type=float, default=0.66, help='Ratio of train samples')
     parser.add_argument('--embedding_dimension', type=float, default=300, help='Word embedding dimension')
     parser.add_argument('--max_sentence_length', type=int, default=15, help = 'Max sentence length is used for attention mechanism')
@@ -174,8 +178,8 @@ def main():
 
     input_lang, output_lang, pairs_train, pairs_test = data.prepareData(args, True)
 
-    encoder = EncoderRNN(args.embedding_dimension).to(device)
-    decoder = DecoderRNN(args.embedding_dimension, output_lang.n_words, dropout_p=0.1).to(device)
+    encoder = EncoderRNN(args.embedding_dimension, device).to(device)
+    decoder = DecoderRNN(args.embedding_dimension, output_lang.n_words, device, dropout_p=0.1).to(device)
 
     trainIters(encoder, decoder, pairs_train, pairs_test, input_lang, output_lang, args)
 

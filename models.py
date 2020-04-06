@@ -5,13 +5,12 @@ import numpy as np
 import fasttext
 import fasttext.util
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 
 class Lang:
-    def __init__(self, name, embedding_dimension):
+    def __init__(self, name, embedding_dimension, load_embedding):
         self.name = name
-        self.pretrained_embedding = fasttext.load_model('./data/embeddings/cc.'+name+'.300.bin')
+        if load_embedding:
+            self.pretrained_embedding = fasttext.load_model('./data/embeddings/cc.'+name+'.300.bin')
 
         if embedding_dimension != 300:
             fasttext.util.reduce_model(self.pretrained_embedding, embedding_dimension)
@@ -39,9 +38,10 @@ class Lang:
 
 
 class EncoderRNN(nn.Module):
-    def __init__(self, hidden_size):
+    def __init__(self, hidden_size, device = 'cpu'):
         super(EncoderRNN, self).__init__()
         # inputs are supposed to be pre-embedded
+        self.device = device
         self.hidden_size = hidden_size
         self.gru = nn.GRU(hidden_size, hidden_size, num_layers = 1, batch_first=True)
 
@@ -52,12 +52,13 @@ class EncoderRNN(nn.Module):
         return output, hidden
 
     def initHidden(self):
-        return torch.zeros(1, 1, self.hidden_size, device=device)
+        return torch.zeros(1, 1, self.hidden_size, device=self.device)
 
 
 class DecoderRNN(nn.Module):
-    def __init__(self, hidden_size, output_size, dropout_p=0.1):
+    def __init__(self, hidden_size, output_size, device = 'cpu', dropout_p=0.1):
         super(DecoderRNN, self).__init__()
+        self.device = device
         self.hidden_size = hidden_size
         self.dropout_p = dropout_p
         self.output_size = output_size
@@ -67,7 +68,6 @@ class DecoderRNN(nn.Module):
         self.dropout = nn.Dropout(self.dropout_p)
         self.gru = nn.GRU(self.hidden_size, self.hidden_size)
         self.out = nn.Linear(self.hidden_size, self.output_size)
-
 
     def forward(self, input, hidden, encoder_outputs):
         embedded = self.embedding(input).view(1, 1, self.hidden_size)
@@ -87,4 +87,4 @@ class DecoderRNN(nn.Module):
         return output, hidden, attn_weights
 
     def initHidden(self):
-        return torch.zeros(1, 1, self.hidden_size, device=device)
+        return torch.zeros(1, 1, self.hidden_size, device=self.device)
