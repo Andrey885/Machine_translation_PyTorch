@@ -1,6 +1,7 @@
 # pet_project
 Hands on machine translation with PyTorch
 
+
 # Setup
 
 You'll need to install the required python packages:
@@ -56,4 +57,11 @@ Train on some more datasets in order to increase word capacity
 
 # Source:
 
+General pipeline:
+
 https://github.com/joosthub/PyTorchNLPBook
+
+Use pretrained embeddings:
+https://wikipedia2vec.github.io/wikipedia2vec/pretrained/
+https://fasttext.cc/docs/en/crawl-vectors.html
+https://medium.com/@martinpella/how-to-use-pre-trained-word-embeddings-in-pytorch-71ca59249f76
