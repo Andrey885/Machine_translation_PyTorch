@@ -111,10 +111,10 @@ def trainIters(encoder, decoder, pairs_train, pairs_test, input_lang, output_lan
                 writer.add_scalar('Loss/test', test_loss, iteration)
 
 
-        torch.save(encoder.state_dict(),
-                   './checkpoints/encoder_' + args.langs[0] + '_' + args.langs[1] + repr(epoch) + '.pth')
-        torch.save(decoder.state_dict(),
-                   './checkpoints/decoder_' + args.langs[0] + '_' + args.langs[1] + repr(epoch) + '.pth')
+                torch.save(encoder.state_dict(),
+                           './checkpoints/encoder_' + args.langs[0] + '_' + args.langs[1] + repr(epoch) + '_' + repr(iteration) + '.pth')
+                torch.save(decoder.state_dict(),
+                           './checkpoints/decoder_' + args.langs[0] + '_' + args.langs[1] + repr(epoch) + '_' + repr(iteration) + '.pth')
 
 
 def trainSentence(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, decoder_optimizer, criterion,

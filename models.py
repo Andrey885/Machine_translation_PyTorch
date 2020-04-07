@@ -12,8 +12,8 @@ class Lang:
         if load_embedding:
             self.pretrained_embedding = fasttext.load_model('./data/embeddings/cc.'+name+'.300.bin')
 
-        if embedding_dimension != 300:
-            fasttext.util.reduce_model(self.pretrained_embedding, embedding_dimension)
+            if embedding_dimension != 300:
+                fasttext.util.reduce_model(self.pretrained_embedding, embedding_dimension)
         self.word2index = {'SOS': 0, 'EOS':1}
         self.index2word = {0: "SOS", 1: "EOS"}
 
@@ -31,7 +31,7 @@ class Lang:
         It may not be true if you decide to train on another dataset.
         """
         if word not in self.word2index:
-            self.word2index[word] = 1
+            self.word2index[word] = self.n_words
             self.index2word[self.n_words] = word
 
             self.n_words += 1
