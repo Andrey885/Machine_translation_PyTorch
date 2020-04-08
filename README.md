@@ -1,6 +1,7 @@
-# pet_project
-Hands on machine translation with PyTorch
+# Machine translation with PyTorch
+Basic hands-on experience in machine translation with PyTorch
 
+In this repo the translator from German to English is trained and demonstrated
 
 # Setup
 
@@ -10,23 +11,31 @@ You'll need to install the required python packages:
 python -m pip install -r requirements.txt
 ```
 
+Download and install pretrained Spacy language models:
+```
+$ sudo python -m spacy download en
+
+$ sudo python -m spacy download de_core_news_sm
+```
+
 # Dataset
 
-In this repo an eng-fra part of GloVe data for word embeddings training is used
+Use [Multi30k](https://github.com/multi30k/dataset) translation dataset available from [PyTorch](https://torchtext.readthedocs.io/en/latest/datasets.html) - a
+ small dataset from 2016 year challenge. The training is done on de-en part of it.
+# Train model
 
-- [Download whole GloVe](http://nlp.stanford.edu/data/glove.6B.zip)
-
-# Train model:
-
-You can train the model with this terminal command
+You can train the model with this terminal command:
 
 ```
 python train.py
 ```
 
-This script will save models in ```./checkpoints/``` . It already contains some pretrained models.
+This script will be saving models in ```./checkpoints/``` . It already contains some pretrained models.
 
 # Results:
+
+The model is capable of producing decent results on samples from test set, achieving 0.35 Bleu score on Multi30k dataset.
+ This indicates nice level of perfomance (however, not as nice as state-of-the-art Bert models).
 
 Run and see how it works:
 
@@ -37,31 +46,29 @@ python demo.py
 Some sample results:
 
 ```
-Input:  vous etes celui qui m a entrainee .
-GT translation:  you re the one who trained me .
-Model translation:  you re the one who trained me .
+Input: eine straße neben einem interessanten ort mit vielen säulen .
+GT translation: a road next to an interesting place with lots of pillars .
+Model output: a street next to a plaza with many interesting pillars .
 
-Input: vous etes fort timide .
-GT translation: you re very timid .
-Model translation:  you re very timid .
-
-Input:  tu trouves toujours des reproches a me faire .
-GT translation: you re always finding fault with me .
-Model translation:  you re always finding fault with me .
+Input: ein skateboarder in einem schwarzen t-shirt und jeans fährt durch die stadt .
+GT translation:  a skateboarder in a black t - shirt and jeans skating threw the city .
+Model output:  a skateboarder in a black t - shirt and jeans is riding through the city .
 
 ```
 
-# To do
-
-Train on some more datasets in order to increase word capacity
-
 # Source:
 
-General pipeline:
+Tutorial with awesome model architectures:
 
+https://github.com/bentrevett/pytorch-seq2seq
+
+**Also useful tutorials**:
+
+Nice short book to understand NLP basics (awful for production and demo, however):
 https://github.com/joosthub/PyTorchNLPBook
 
-Use pretrained embeddings:
-https://wikipedia2vec.github.io/wikipedia2vec/pretrained/
-https://fasttext.cc/docs/en/crawl-vectors.html
-https://medium.com/@martinpella/how-to-use-pre-trained-word-embeddings-in-pytorch-71ca59249f76
+Tutorials from good PyTorch folks, also nice and simple to get started:
+
+https://pytorch.org/tutorials/intermediate/seq2seq_translation_tutorial.html
+
+https://pytorch.org/tutorials/intermediate/seq2seq_translation_tutorial.html

@@ -311,3 +311,22 @@ class Seq2Seq(nn.Module):
     def initialize_weights(m):
         if hasattr(m, 'weight') and m.weight.dim() > 1:
             nn.init.xavier_uniform_(m.weight.data)
+
+def build_model(args, src_lang, trg_lang, input_dim, output_dim, device):
+    input_dim = len(src_lang.vocab)
+    output_dim = len(trg_lang.vocab)
+
+    enc = Encoder(input_dim, args.hidden_size, args.n_layers,
+                  args.n_heads, args.pf_dim, args.dropout,
+                  device)
+
+    dec = Decoder(output_dim, args.hidden_size, args.n_layers,
+                  args.n_heads, args.pf_dim, args.dropout,
+                  device)
+
+    src_pad_idx = src_lang.vocab.stoi[src_lang.pad_token]
+    trg_pad_idx = trg_lang.vocab.stoi[trg_lang.pad_token]
+
+    model = Seq2Seq(enc, dec, src_pad_idx, trg_pad_idx, device).to(device)
+
+    return model

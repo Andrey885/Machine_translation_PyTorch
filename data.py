@@ -1,7 +1,7 @@
 import spacy
 from models import Encoder, Decoder, Seq2Seq
 import torchtext
-from torchtext.datasets import TranslationDataset, Multi30k
+from torchtext.datasets import Multi30k
 from torchtext.data import Field, BucketIterator
 
 
@@ -34,24 +34,4 @@ def prepare_data(args, device):
     src_lang.build_vocab(train_data, min_freq=2)
     trg_lang.build_vocab(train_data, min_freq=2)
 
-    train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
-        (train_data, valid_data, test_data), batch_size=args.batch_size,
-        device=device)
-
-    input_dim = len(src_lang.vocab)
-    output_dim = len(trg_lang.vocab)
-
-    enc = Encoder(input_dim, args.hidden_size, args.n_layers,
-                  args.n_heads, args.pf_dim, args.dropout,
-                  device)
-
-    dec = Decoder(output_dim, args.hidden_size, args.n_layers,
-                  args.n_heads, args.pf_dim, args.dropout,
-                  device)
-
-    src_pad_idx = src_lang.vocab.stoi[src_lang.pad_token]
-    trg_pad_idx = trg_lang.vocab.stoi[trg_lang.pad_token]
-
-    model = Seq2Seq(enc, dec, src_pad_idx, trg_pad_idx, device).to(device)
-
-    return model, train_iterator, valid_iterator, test_iterator, trg_pad_idx
+    return train_data, valid_data, test_data, src_lang, trg_lang
