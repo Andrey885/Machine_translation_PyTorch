@@ -65,6 +65,7 @@ https://github.com/bentrevett/pytorch-seq2seq
 **Also useful tutorials**:
 
 Nice short book to understand NLP basics (awful for production and demo, however):
+
 https://github.com/joosthub/PyTorchNLPBook
 
 Tutorials from good PyTorch folks, also nice and simple to get started:
