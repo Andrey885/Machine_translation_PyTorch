@@ -35,7 +35,7 @@ This script will be saving models in ```./checkpoints/``` . It already contains 
 # Results:
 
 The model is capable of producing decent results on samples from test set, achieving 0.35 Bleu score on Multi30k dataset.
- This indicates nice level of perfomance (however, not as nice as state-of-the-art Bert models).
+ This indicates nice level of perfomance (however, not as nice as state-of-the-art pretrained Bert models).
 
 Run and see how it works:
 
