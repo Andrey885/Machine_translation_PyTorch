@@ -1,14 +1,9 @@
 import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.tensorboard.writer import SummaryWriter
 import numpy as np
 import argparse
 import os
-import datetime
 import json
 from termcolor import colored
-from tqdm import tqdm
 from data import prepare_data
 from models import build_model
 from utils import translate_sentence
