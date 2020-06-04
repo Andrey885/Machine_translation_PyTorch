@@ -49,7 +49,24 @@ python train.py
 
 This script will be saving models in ```./checkpoints/``` . It already contains some pretrained models.
 
-# Results:
+# Hyperparameter search
+
+Several experiments on model hyperparameters were held. The training curves may be found on [tensorboard dev](https://tensorboard.dev/experiment/VWH2PYOnQnWpatD57MnjLA/#scalars&_smoothingWeight=0)
+
+We acquired the following table:
+
+| Experiment id | hidden_size | pf_dim | n_heads | n_layers | Bleu score
+| 1 | 256 | 512 | 8 | 3 | 0.3390
+| 2 | 128 | 512 | 8 | 3 | 0.3507
+| 3 | 64 | 512 | 8 | 3 | 0.3353
+| 4 | 128 | 1024 | 8 | 3 | **0.3582**
+| 5 | 256 | 2048 | 8 | 3 | 0.3385
+| 6 | 128 | 1024 | 4 | 3 | 0.3557
+| 7 | 128 | 1024 | 16 | 3 | 0.3464
+| 8 | 128 | 1024 | 8 | 4 | 0.3494
+| 9 | 128 | 1024 | 8 | 2 | 0.3460
+
+# Results
 
 The model is capable of producing decent results on samples from test set, achieving 0.35 Bleu score on Multi30k dataset.
  This indicates nice level of perfomance (however, not as nice as state-of-the-art pretrained Bert models).
@@ -79,7 +96,7 @@ Tutorial with awesome model architectures:
 
 https://github.com/bentrevett/pytorch-seq2seq
 
-Paper with the description of **attention** model:
+Paper with the description of attention model:
 
 https://arxiv.org/abs/1706.03762
 
