@@ -33,7 +33,7 @@ $ sudo python -m spacy download de_core_news_sm
  git submodule update
  ```
  
- 4. Download a [pretrained model](https://drive.google.com/drive/u/0/folders/13qQTz_GgBbwokAsphghqryVmjV2SE4KI) and kindly put it in *checkpoints* folder.
+ 4. Download a [pretrained model](https://drive.google.com/uc?id=1rNYfjFcSnp3Mi5sv0CL4Q9w6lQVlxhMh) and kindly put it in *checkpoints* folder.
  
 # Dataset
 
