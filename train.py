@@ -10,7 +10,7 @@ import glog as log
 from tqdm import tqdm
 from data import prepare_data
 from models import build_model
-from eval import evaluate
+from eval import evaluate, calculate_bleu
 
 def train(model, iterator, optimizer, criterion, writer, epoch, clip=1):
     model.train()
@@ -29,7 +29,6 @@ def train(model, iterator, optimizer, criterion, writer, epoch, clip=1):
         optimizer.step()
         epoch_loss += loss.item()
         writer.add_scalar('Loss/train', loss.item(), epoch * len(iterator) + i)
-
     return epoch_loss / len(iterator)
 
 
@@ -65,20 +64,22 @@ def main():
     best_val_loss = float('inf')
     os.makedirs('./logs', exist_ok=True)
     writer = SummaryWriter(log_dir='./logs/_{:%Y_%m_%d_%H_%M}'.format(datetime.datetime.now()))
-    # DEBUG: add tensorboard dev
     for epoch in range(args.n_epochs):
         train_loss = train(model, train_iterator, optimizer, criterion, writer, epoch)
         val_loss = evaluate(model, valid_iterator, criterion)
-
+        bleu_score = calculate_bleu(valid_data, src_lang, trg_lang, model, device, max_len=100)
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             torch.save(model.state_dict(), f'./checkpoints/en_de_best.pt')
         torch.save(model.state_dict(), f'./checkpoints/en_de{epoch}.pt')
 
         writer.add_scalar('Loss/val', val_loss, epoch*len(train_iterator))
+        writer.add_scalar('Bleu_score', bleu_score, epoch*len(train_iterator))
+
         log.info(f'Epoch: {epoch}')
         log.info(f'\tTrain Loss: {train_loss:.3f}')
         log.info(f'\t Val. Loss: {val_loss:.3f}')
+        log.info(f'\t Val. Bleu: {bleu_score:.3f}')
 
 
 if __name__ == '__main__':
