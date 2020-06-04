@@ -56,6 +56,7 @@ Several experiments on model hyperparameters were held. The training curves may 
 We acquired the following table:
 
 | Experiment id | hidden_size | pf_dim | n_heads | n_layers | Bleu score
+|---|---|---|---|---|---|
 | 1 | 256 | 512 | 8 | 3 | 0.3390
 | 2 | 128 | 512 | 8 | 3 | 0.3507
 | 3 | 64 | 512 | 8 | 3 | 0.3353
