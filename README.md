@@ -124,8 +124,8 @@ We acquired the following table:
 ## Results&Demo
 
 The model is capable of producing decent results on samples from test set,
- achieving **0.3582** (with experiment id 4 config) Bleu score on
-  de-en part of Multi30k dataset, which indicates a nice level of perfomance.
+ achieving **0.3582** Bleu score on val and **0.3347** on test 
+  sets (with experiment id 4 config) of de-en part of Multi30k dataset, which indicates a nice level of perfomance.
 
 Run and see how it works:
 
