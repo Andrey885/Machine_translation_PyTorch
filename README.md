@@ -51,7 +51,7 @@ This script will be saving models in ```./checkpoints/``` . It already contains 
 
 # Hyperparameter search
 
-Several experiments on model hyperparameters were held. The training curves may be found on [tensorboard dev](https://tensorboard.dev/experiment/VWH2PYOnQnWpatD57MnjLA/#scalars&_smoothingWeight=0)
+Several experiments on model hyperparameters were held. The training curves may be found on [tensorboard dev](https://tensorboard.dev/experiment/ksbaLHxzRgqGgPlbE5kWqw/)
 
 We acquired the following table:
 
