@@ -1,21 +1,45 @@
 # Machine translation with PyTorch
+![PyTorch Logo](https://github.com/pytorch/pytorch/blob/master/docs/source/_static/img/pytorch-logo-dark.png)
 
 [![Build Status](https://github.com/Andrey885/Machine_translation_PyTorch/blob/master/.github/workflows/build-passing.svg)](https://github.com/Andrey885/Machine_translation_PyTorch/actions)
 
-Basic hands-on experience in machine translation with PyTorch
+## Introduction
+The attention mechanism is a popular easy-to-implement model architecture
+designed to perform well on different NLP tasks, including machine translation.
+ Empowered with pretrained [SpaCy](#https://spacy.io/) word model this
+approach makes a strong baseline with comparable to state-of-the-art perfomance.
+In this repo the translator from German to English is trained and demonstrated. In case
+you need other languages support, thanks to SpaCy team there are
+ plenty of available language models to train the exact same model on.
+ Pretrained German-English model is already available after setup.
 
-In this repo the translator from German to English is trained and demonstrated
 
-# Setup
+ ## Major dependencies
+ 1. Python 3.8
 
-Use setup script:
+ 2. PyTorch 1.5.0
+
+ 3. SpaCy 2.2.4
+
+## Contents
+1. [Setup](#Setup)
+2. [Dataset](#Dataset)
+3. [Train model](#Train-model)
+4. [Hyperparameter tuning](#Hyperparameter-tuning)
+5. [Results&Demo](#Results&Demo)
+6. [Source](#Source)
+
+
+## Setup
+
+Use automatic setup script:
 ```
 bash setup.sh
 ```
 
 (If encounter a problem with Windows line endings, run *sed -i 's/\r//g' setup.sh* first)
 
-or complete the installation manually in four steps:
+or complete the installation manually in four steps (which is also easy):
 
  1. Install the required python packages:
 
@@ -25,36 +49,61 @@ python -m pip install -r requirements.txt
 
  2. Download and install pretrained Spacy language models:
 ```
-$ sudo python -m spacy download en
-
-$ sudo python -m spacy download de_core_news_sm
+sudo python -m spacy download en
+sudo python -m spacy download de_core_news_sm
 ```
 
  3. Clone submodules
+
  ```
  git submodule init
  git submodule update
  ```
- 
- 4. Download a [pretrained model](https://drive.google.com/uc?id=1rNYfjFcSnp3Mi5sv0CL4Q9w6lQVlxhMh) and kindly put it in *checkpoints* folder.
- 
-# Dataset
+
+ 4. Download a [pretrained model](https://drive.google.com/uc?id=1rNYfjFcSnp3Mi5sv0CL4Q9w6lQVlxhMh)
+  and please kindly put it in *checkpoints* folder.
+
+## Dataset
 
 Use [Multi30k](https://github.com/multi30k/dataset) translation dataset available from [PyTorch](https://torchtext.readthedocs.io/en/latest/datasets.html) - a
- small dataset from 2016 year challenge. The training is done on de-en part of it.
-# Train model
+ small dataset from 2016 year challenge. The training is done on de-en part of it. The dataset statistics is the following:
 
-You can train the model with this terminal command:
+```
+train:
+ (en) 29000 sentences, 377534 words, 13.0 words/sent
+ (de) 29000 sentences, 360706 words, 12.4 words/sent
+ val:
+ (en) 1014 sentences, 13308 words, 13.1 words/sent
+ (de) 1014 sentences, 12828 words, 12.7 words/sent
+ test:
+ (en) 1000 sentences, 11376 words, 11.4 words/sent
+ (de) 1000 sentences, 10758 words, 10.8 words/sent
+```
 
+Example pair of sentences:
+```
+ ein mädchen in einem karateanzug bricht ein brett mit einem tritt .
+ a girl in karate uniform breaking a stick with a front kick .
+```
+
+## Train model
+
+You can simply start training the model with this terminal command:
 ```
 python train.py
 ```
+Default arguments are set to optimal: see
+ [Hyperparameter tuning](#Hyperparameter-tuning) section.
+However, you are encouraged to make your own experiments.
 
-This script will be saving models in ```./checkpoints/``` . It already contains some pretrained models after setup.
+This script will be saving models in ```./checkpoints/``` and writing logs in ```./logs/``` folders.
+ Best pretrained model is already available after setup at ```./checkpoints/en_de_final.pt```
 
-# Hyperparameter tuning
+## Hyperparameter tuning
 
-Several experiments on model hyperparameters were held. The training curves may be found on [tensorboard dev](https://tensorboard.dev/experiment/ksbaLHxzRgqGgPlbE5kWqw/)
+Several experiments on model hyperparameters were held.
+The training curves may be found on
+[tensorboard dev](https://tensorboard.dev/experiment/ksbaLHxzRgqGgPlbE5kWqw/).
 
 We acquired the following table:
 
@@ -70,10 +119,11 @@ We acquired the following table:
 | 8 | 128 | 1024 | 8 | 4 | 0.3494
 | 9 | 128 | 1024 | 8 | 2 | 0.3460
 
-# Results
+## Results&Demo
 
-The model is capable of producing decent results on samples from test set, achieving 0.3582 Bleu score on Multi30k dataset.
- This indicates nice level of perfomance (however, not as nice as state-of-the-art pretrained Bert models).
+The model is capable of producing decent results on samples from test set,
+ achieving **0.3582** (with experiment id 4 config) Bleu score on
+  de-en part of Multi30k dataset, which indicates a nice level of perfomance.
 
 Run and see how it works:
 
@@ -91,10 +141,9 @@ Model output: a street next to a plaza with many interesting pillars .
 Input: ein skateboarder in einem schwarzen t-shirt und jeans fährt durch die stadt .
 GT translation:  a skateboarder in a black t - shirt and jeans skating threw the city .
 Model output:  a skateboarder in a black t - shirt and jeans is riding through the city .
-
 ```
 
-# Source:
+## Source
 
 Tutorial with awesome model architectures:
 
