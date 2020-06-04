@@ -28,10 +28,10 @@ $ sudo python -m spacy download de_core_news_sm
 ```
 
  3. Clone submodules
- '''
+ ```
  git submodule init
  git submodule update
- '''
+ ```
  
  4. Download a [pretrained model](https://drive.google.com/drive/u/0/folders/13qQTz_GgBbwokAsphghqryVmjV2SE4KI) and kindly put it in *checkpoints* folder.
  
