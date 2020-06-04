@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 import sys
-sys.path.append('attention_is_all_you_need_pytorch') # fix imports inside submodule
+sys.path.append('attention_is_all_you_need_pytorch')  # fix imports inside submodule
 from transformer.Layers import EncoderLayer, DecoderLayer
 
 
@@ -16,12 +16,12 @@ class Encoder(nn.Module):
         self.tok_embedding = nn.Embedding(input_dim, hid_dim)
         self.pos_embedding = nn.Embedding(max_length, hid_dim)
 
-        self.layers = nn.ModuleList([EncoderLayer(d_model = hid_dim,
-                                                  n_head = n_heads,
-                                                  d_inner = pf_dim,
-                                                  d_k = hid_dim//n_heads,
-                                                  d_v = hid_dim//n_heads,
-                                                  dropout = dropout)
+        self.layers = nn.ModuleList([EncoderLayer(d_model=hid_dim,
+                                                  n_head=n_heads,
+                                                  d_inner=pf_dim,
+                                                  d_k=hid_dim//n_heads,
+                                                  d_v=hid_dim//n_heads,
+                                                  dropout=dropout)
                                      for _ in range(n_layers)])
 
         self.dropout = nn.Dropout(dropout)
@@ -47,12 +47,12 @@ class Decoder(nn.Module):
 
         self.tok_embedding = nn.Embedding(output_dim, hid_dim)
         self.pos_embedding = nn.Embedding(max_length, hid_dim)
-        self.layers = nn.ModuleList([DecoderLayer(d_model = hid_dim,
-                                                  n_head = n_heads,
-                                                  d_inner = pf_dim,
-                                                  d_k = hid_dim//n_heads,
-                                                  d_v = hid_dim//n_heads,
-                                                  dropout = dropout)
+        self.layers = nn.ModuleList([DecoderLayer(d_model=hid_dim,
+                                                  n_head=n_heads,
+                                                  d_inner=pf_dim,
+                                                  d_k=hid_dim//n_heads,
+                                                  d_v=hid_dim//n_heads,
+                                                  dropout=dropout)
                                      for _ in range(n_layers)])
 
         self.fc_out = nn.Linear(hid_dim, output_dim)
@@ -112,9 +112,6 @@ class Seq2Seq(nn.Module):
 
 
 def build_model(args, src_lang, trg_lang, input_dim, output_dim, device):
-    input_dim = len(src_lang.vocab)
-    output_dim = len(trg_lang.vocab)
-
     enc = Encoder(input_dim, args.hidden_size, args.n_layers,
                   args.n_heads, args.pf_dim, args.dropout,
                   device)

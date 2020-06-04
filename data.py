@@ -1,11 +1,9 @@
 import spacy
-from models import Encoder, Decoder, Seq2Seq
-import torchtext
 from torchtext.datasets import Multi30k
-from torchtext.data import Field, BucketIterator
+from torchtext.data import Field
 
 
-def prepare_data(args, device):
+def prepare_data():
     def tokenize_de(text):
         """
         Tokenizes German text from a string into a list of strings
@@ -18,8 +16,8 @@ def prepare_data(args, device):
         """
         return [tok.text for tok in spacy_en.tokenizer(text)]
 
-    # sudo python3 -m spacy download en
-    # sudo python3 -m spacy download de_core_news_sm
+    # don't forget to run '$ sudo python3 -m spacy download en & sudo python3 -m spacy download de_core_news_sm'
+    # if getting 'Can't find model 'en_core_web_sm' error here
     spacy_en = spacy.load('en_core_web_sm')
     spacy_de = spacy.load('de_core_news_sm')
 
