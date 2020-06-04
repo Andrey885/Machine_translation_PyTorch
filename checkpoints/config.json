@@ -3,9 +3,9 @@
     "lr": 0.0005,
     "n_epochs": 20,
     "batch_size": 128,
-    "hidden_size": 256,
+    "hidden_size": 128,
     "n_heads": 8,
     "n_layers": 3,
-    "pf_dim": 512,
+    "pf_dim": 1024,
     "dropout": 0.1
 }
