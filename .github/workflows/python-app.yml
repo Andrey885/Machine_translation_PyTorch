@@ -22,10 +22,10 @@ jobs:
         python-version: 3.8
     - name: Install dependencies
       run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -r requirements.txt
-        sudo python3 -m spacy download en
-        sudo python3 -m spacy download de_core_news_sm
+        /opt/hostedtoolcache/Python/3.8.3/x64/bin/python -m pip install --upgrade pip
+        /opt/hostedtoolcache/Python/3.8.3/x64/bin/python -m pip install -r requirements.txt
+        sudo /opt/hostedtoolcache/Python/3.8.3/x64/bin/python -m spacy download en
+        sudo /opt/hostedtoolcache/Python/3.8.3/x64/bin/python -m spacy download de_core_news_sm
         git submodule init
         git submodule update
         wget https://drive.google.com/uc?id=1d-Q-tzGo1RN_YbmvMP5gArQZZdSnclJ0 -O checkpoints/en_de_final.pt
@@ -37,4 +37,4 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        python3 demo.py
+        /opt/hostedtoolcache/Python/3.8.3/x64/bin/python demo.py
