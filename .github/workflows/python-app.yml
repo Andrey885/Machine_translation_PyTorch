@@ -22,8 +22,12 @@ jobs:
         python-version: 3.8
     - name: Install dependencies
       run: |
-        sed -i 's/\r//g' setup.sh
-        bash setup.sh
+        python -m pip install -r requirements.txt
+        sudo python -m spacy download en
+        sudo python -m spacy download de_core_news_sm
+        git submodule init
+        git submodule update
+        wget https://drive.google.com/uc?id=1d-Q-tzGo1RN_YbmvMP5gArQZZdSnclJ0 -O checkpoints/en_de_final.pt
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -32,4 +36,4 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        python3 demo.py
+        python demo.py
