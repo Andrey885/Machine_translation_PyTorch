@@ -12,6 +12,7 @@ from data import prepare_data
 from models import build_model
 from eval import evaluate, calculate_bleu
 
+
 def train(model, iterator, optimizer, criterion, writer, epoch, clip=1):
     model.train()
     epoch_loss = 0
@@ -70,7 +71,7 @@ def main():
         bleu_score = calculate_bleu(valid_data, src_lang, trg_lang, model, device, max_len=100)
         if val_loss < best_val_loss:
             best_val_loss = val_loss
-            torch.save(model.state_dict(), f'./checkpoints/en_de_best.pt')
+            torch.save(model.state_dict(), './checkpoints/en_de_best.pt')
         torch.save(model.state_dict(), f'./checkpoints/en_de{epoch}.pt')
 
         writer.add_scalar('Loss/val', val_loss, epoch*len(train_iterator))
