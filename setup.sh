@@ -4,3 +4,4 @@ sudo python3 -m spacy download en
 sudo python3 -m spacy download de_core_news_sm
 git submodule init
 git submodule update
+
