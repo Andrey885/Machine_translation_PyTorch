@@ -5,12 +5,12 @@ In this repo the translator from German to English is trained and demonstrated
 
 # Setup
 
-You may use setup script:
+Use setup script:
 ```
-sed -i 's/\r//g' setup.sh # edit line endings
-
 bash setup.sh
 ```
+
+(If encounter a problem with Windows line endings, run *sed -i 's/\r//g' setup.sh* first)
 
 or complete the installation manually in four steps:
 
