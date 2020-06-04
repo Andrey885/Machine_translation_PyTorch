@@ -14,7 +14,7 @@ bash setup.sh
 
 or complete the installation manually in four steps:
 
- 1. You'll need to install the required python packages:
+ 1. Install the required python packages:
 
 ```
 python -m pip install -r requirements.txt
