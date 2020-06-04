@@ -47,7 +47,7 @@ You can train the model with this terminal command:
 python train.py
 ```
 
-This script will be saving models in ```./checkpoints/``` . It already contains some pretrained models.
+This script will be saving models in ```./checkpoints/``` . It already contains some pretrained models after setup.
 
 # Hyperparameter tuning
 
