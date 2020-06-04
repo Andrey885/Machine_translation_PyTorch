@@ -1,5 +1,5 @@
 # Machine translation with PyTorch
-![PyTorch Logo](https://github.com/Andrey885/Machine_translation_PyTorch/blob/master/gotta_torch.png =300x169)
+![PyTorch Logo](https://github.com/Andrey885/Machine_translation_PyTorch/blob/master/gotta_torch.png){:height="300px" width="169px"}
 
 [![Build Status](https://github.com/Andrey885/Machine_translation_PyTorch/blob/master/.github/workflows/build-passing.svg)](https://github.com/Andrey885/Machine_translation_PyTorch/actions)
 
