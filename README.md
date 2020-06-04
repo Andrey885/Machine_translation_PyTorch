@@ -1,4 +1,7 @@
 # Machine translation with PyTorch
+
+[![Build Status](https://github.com/Andrey885/Machine_translation_PyTorch/blob/master/.github/workflows/build-passing.svg)](https://github.com/Andrey885/Machine_translation_PyTorch/actions)
+
 Basic hands-on experience in machine translation with PyTorch
 
 In this repo the translator from German to English is trained and demonstrated
