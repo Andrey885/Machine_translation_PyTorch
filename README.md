@@ -49,7 +49,7 @@ python train.py
 
 This script will be saving models in ```./checkpoints/``` . It already contains some pretrained models.
 
-# Hyperparameter search
+# Hyperparameter tuning
 
 Several experiments on model hyperparameters were held. The training curves may be found on [tensorboard dev](https://tensorboard.dev/experiment/ksbaLHxzRgqGgPlbE5kWqw/)
 
@@ -69,7 +69,7 @@ We acquired the following table:
 
 # Results
 
-The model is capable of producing decent results on samples from test set, achieving 0.35 Bleu score on Multi30k dataset.
+The model is capable of producing decent results on samples from test set, achieving 0.3582 Bleu score on Multi30k dataset.
  This indicates nice level of perfomance (however, not as nice as state-of-the-art pretrained Bert models).
 
 Run and see how it works:
