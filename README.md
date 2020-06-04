@@ -6,36 +6,35 @@ In this repo the translator from German to English is trained and demonstrated
 # Setup
 
 You may use setup script:
-'''
+```
 sed -i 's/\r//g' setup.sh # edit line endings
 
 bash setup.sh
-'''
+```
 
 or complete the installation manually in four steps:
 
-\begin{enumerate}
-  \item You'll need to install the required python packages:
+ 1. You'll need to install the required python packages:
 
 ```
 python -m pip install -r requirements.txt
 ```
 
- \item Download and install pretrained Spacy language models:
+ 2. Download and install pretrained Spacy language models:
 ```
 $ sudo python -m spacy download en
 
 $ sudo python -m spacy download de_core_news_sm
 ```
 
- \item Pull submodules
+ 3. Clone submodules
  '''
  git submodule init
  git submodule update
  '''
  
- \item Download a [pretrained model](https://drive.google.com/drive/u/0/folders/13qQTz_GgBbwokAsphghqryVmjV2SE4KI) and kindly put it in *checkpoints* folder.
-\end{enumerate}
+ 4. Download a [pretrained model](https://drive.google.com/drive/u/0/folders/13qQTz_GgBbwokAsphghqryVmjV2SE4KI) and kindly put it in *checkpoints* folder.
+ 
 # Dataset
 
 Use [Multi30k](https://github.com/multi30k/dataset) translation dataset available from [PyTorch](https://torchtext.readthedocs.io/en/latest/datasets.html) - a
